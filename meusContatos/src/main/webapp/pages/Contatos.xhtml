@@ -1,0 +1,269 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<ui:define name="content">
+		<h1 class="aw-page-title">Contatos</h1>
+
+		<h:form id="frm">
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton id="btnAdd" title="Novo registro"
+						action="#{contatoC.preparaInclusao}"
+						oncomplete="PF('itemDialog').show()" process="@this"
+						update=":formCadastro:itemPanel" icon="fa fa-fw fa-plus" />
+
+					<p:commandButton id="btnEdi" title="Edita registro"
+						action="#{contatoC.preparaAlteracao}"
+						oncomplete="PF('itemDialog').show()" process="@this"
+						update=":formCadastro:itemPanel" icon="fa fa-fw fa-edit" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:messages autoUpdate="false" />
+
+			<p:dataTable id="itensTable" widgetVar="dataTable" var="item"
+				loadingMessage="Carregando..." emptyMessage="Nenhum registro."
+				reflow="true" value="#{contatoC.elementos}" selectionMode="single"
+				selection="#{contatoC.registroSelecionado}" rowKey="#{item.id}"
+				style="margin-top:10px">
+
+				<p:ajax event="rowSelect" listener="#{contatoC.selectRegistro}" />
+
+				<p:column headerText="Id" style="width:50px">
+					<h:outputText value="#{item.id}" />
+				</p:column>
+
+				<p:column headerText="Nome">
+					<h:outputText value="#{item.conNome}" />
+				</p:column>
+
+				<p:column headerText="Fone">
+					<h:outputText value="#{item.conFone}" />
+				</p:column>
+
+				<p:column headerText="Email">
+					<h:outputText value="#{item.conEmail}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="itemDialog" header="Gerencia contatos"
+			responsive="true" resizable="false" showEffect="explode"
+			style="min-width: 400px" modal="true" id="dialogGerContatos">
+
+			<h:form id="formCadastro" enctype="multipart/form-data">
+
+				<p:toolbar>
+					<p:toolbarGroup>
+						<p:commandButton icon="fa fa-fw fa-save" title="Salvar"
+							action="#{contatoC.salvar}"
+							update=":formCadastro:itemPanel :frm:itensTable"
+							oncomplete="closeDialogIfSucess(xhr, status, args, PF('itemDialog'), 'itemDialog')"
+							style="width:120px;" />
+
+						<p:commandButton icon="ui-icon-close" title="Sair"
+							oncomplete="PF('itemDialog').hide()" style="width:120px;" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+
+				<h:panelGroup id="itemPanel" layout="block" styleClass="ui-fluid">
+
+					<p:messages id="msgDialog" autoUpdate="false" />
+					<!-- styleClass="ui-noborder" -->
+
+					<p:panelGrid style="margin-top:2px; width:100%;">
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="nome" value="Nome:" />
+							</p:column>
+							<p:column colspan="5">
+								<p:inputText id="nome" value="#{contatoC.contato.conNome}"
+									required="true" placeholder="Nome" />
+							</p:column>
+							<p:column colspan="6" rowspan="5">
+								<p:graphicImage id="foto" value="#{imagemBean.foto}" width="150"
+									height="160" title="Foto" style="margin-left: 10px;">
+									<f:param name="arquivo" value="#{contatoC.contato.conArquivo}" />
+								</p:graphicImage>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="ocupacao" value="Ocupação:" />
+							</p:column>
+							<p:column colspan="5">
+								<p:selectOneMenu id="ocupacao"
+									value="#{contatoC.contato.ocupacao}"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems value="#{contatoC.ocupacoes}" var="itemO"
+										itemValue="#{itemO}" itemLabel="#{itemO.dsOcupacao}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="sexo" value="Genero:" />
+							</p:column>
+							<p:column colspan="5">
+								<p:selectOneRadio id="sexo" value="#{contatoC.contato.conSexo}">
+									<f:selectItem itemLabel="Masculino" itemValue="M" />
+									<f:selectItem itemLabel="Feminino" itemValue="F" />
+								</p:selectOneRadio>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="nascimento" value="Nascimento:" />
+							</p:column>
+							<p:column colspan="5" style="padding-right: 261px;">
+								<p:calendar id="nascimento"
+									value="#{contatoC.contato.conDtnasc}" mode="popup"
+									pattern="dd/MM/yyyy" size="12" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="cep" value="Cep:" />
+							</p:column>
+							<p:column colspan="5">
+								<p:inputMask mask="99999-999" id="cep"
+									value="#{contatoC.contato.conCep}" style="width:90px;" />
+
+								<p:commandButton icon="fa fa-search" process="@this cep"
+									actionListener="#{contatoC.doAddressFind}"
+									style="margin-left:3px; width:50px;" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="endereco" value="Logradouro:" />
+							</p:column>
+							<p:column colspan="11">
+								<p:inputText id="endereco"
+									value="#{contatoC.contato.conEndereco}"
+									placeholder="Nome do logradouro"
+									style="width:87%; margin-right:5px;" />
+								<p:inputText id="numero" value="#{contatoC.contato.conNumero}"
+									placeholder="Numero" style="width:12%;" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="bairro" value="Bairro:" />
+							</p:column>
+							<p:column colspan="11">
+								<p:inputText id="bairro" value="#{contatoC.contato.conBairro}"
+									placeholder="Bairro" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="uf" value="UF:" />
+							</p:column>
+							<p:column colspan="2">
+								<h:panelGroup id="panelUf" layout="block">
+									<p:selectOneMenu id="uf" value="#{contatoC.estado}"
+										converter="omnifaces.SelectItemsConverter" rendered="true">
+										<f:selectItem noSelectionOption="true" itemLabel="Selecione" />
+										<f:selectItems value="#{contatoC.estados}" var="itemE"
+											itemValue="#{itemE}" itemLabel="#{itemE.dsEstado}" />
+										<p:ajax update="cidade" event="change"
+											listener="#{contatoC.getMunicipios}" />
+									</p:selectOneMenu>
+								</h:panelGroup>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="cidade" value="Municipio:" />
+							</p:column>
+							<p:column colspan="8">
+								<h:panelGroup id="panelMunicipio" layout="block">
+									<p:selectOneMenu id="cidade"
+										value="#{contatoC.contato.municipio}" filter="true"
+										filterMatchMode="startsWith" effect="fold"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItem noSelectionOption="true" itemLabel="Selecione" />
+										<f:selectItems value="#{contatoC.municipios}" var="itemM"
+											itemValue="#{itemM}" itemLabel="#{itemM.dsMunicipio}" />
+									</p:selectOneMenu>
+								</h:panelGroup>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="fone" value="Telefone:" />
+							</p:column>
+							<p:column colspan="2">
+								<p:inputMask mask="(99)9999-9999" id="fone"
+									value="#{contatoC.contato.conFone}" style="width:180px;" />
+							</p:column>
+							<p:column>
+								<p:outputLabel for="cel" value="Celular:" />
+							</p:column>
+							<p:column colspan="8">
+								<p:inputMask mask="(99)99999-9999" id="cel"
+									value="#{contatoC.contato.conCel}" style="width:180px;" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="email" value="E-mail:" />
+							</p:column>
+							<p:column colspan="11">
+								<p:inputText id="email" value="#{contatoC.contato.conEmail}"
+									placeholder="Email" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="skype" value="Skype:" />
+							</p:column>
+							<p:column colspan="11">
+								<p:inputText id="skype" value="#{contatoC.contato.conSkype}"
+									placeholder="Skype" />
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column colspan="12">
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Arquivo:" />
+							</p:column>
+							<p:column colspan="11">
+								<p:fileUpload mode="advanced" auto="true" label="Arquivo"
+									fileUploadListener="#{contatoC.upload}"
+									allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+									update=":formCadastro:foto" />
+							</p:column>
+						</p:row>
+
+					</p:panelGrid>
+				</h:panelGroup>
+
+			</h:form>
+
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>

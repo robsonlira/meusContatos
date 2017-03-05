@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+	<meta charset="UTF-8" />
+	<title>Index</title>
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+	<h:outputStylesheet library="css" name="custom.css" />
+	<h:outputStylesheet library="css" name="layout.css" />
+	<h:outputStylesheet library="css" name="components.css" />
+
+</h:head>
+<f:view locale="#{localeController.currentLocale}">
+	<h:body style="background: #d2d6de;">
+
+		<f:metadata>
+			<f:viewParam name="dummy" />
+			<f:event listener="#{loginBean.preRender}" type="preRenderView" />
+		</f:metadata>
+
+		<div style="width: 360px; margin: 7% auto; background: #4197cc;">
+
+			<div
+				style="font-size: 35px; text-align: center; margin-bottom: 25px; font-weight: 300; background: #4197cc;">
+				Web<b>Contatos</b>
+			</div>
+
+
+			<h:panelGroup id="loginPanel" layout="block" styleClass="ui-fluid"
+				style="background: #fff; padding: 20px; border-top: 0; color: #666;">
+				<p>#{messages['bemVindo']}!</p>
+				<h:form id="loginForm" prependId="false">
+
+					<p:messages id="messages" autoUpdate="true" closable="true" />
+
+					<div class="ui-g">
+						<div class="ui-g-12">
+							<p:inputText id="j_username" value="#{loginBean.login}"
+								pt:autocorrect="off" pt:spellcheck="false" pt:autocomplete="off"
+								pt:autocapitalize="off" placeholder="#{messages.login}"
+								style="height: 22px; width: 270px;" />
+							<span class="fa fa-user"></span>
+						</div>
+						<div class="ui-g-12">
+							<p:password id="j_password" pt:autocorrect="off"
+								pt:spellcheck="false" placeholder="#{messages.senha}"
+								style="height: 22px; width: 270px;" />
+							<span class="fa fa-lock"></span>
+						</div>
+
+						<div class="ui-g-12">
+							<a href="#" style="display: none"></a>
+						</div>
+
+						<div class="ui-g-12">
+							<p:commandButton value="#{messages.login}"
+								action="#{loginBean.login}"
+								style="width: 110px; height: 32px; color: #fff; background: #4197cc; margin-left: 168px;"
+								ajax="false" />
+						</div>
+					</div>
+				</h:form>
+			</h:panelGroup>
+
+			<h:form id="langauge_form">
+				<h:panelGrid columns="3" style="margin-top: 5px; margin-left: 5px;">
+
+					<p:commandLink action="#{localeController.changeLanguage('pt')}"
+						update="loginPanel">
+						<p:graphicImage name="flag_pt_BR.gif" library="images" />
+					</p:commandLink>
+					<p:commandLink
+						actionListener="#{localeController.changeLanguage('en')}"
+						update="loginPanel">
+						<p:graphicImage name="flag_en_US.gif" library="images" />
+					</p:commandLink>
+					<p:commandLink
+						actionListener="#{localeController.changeLanguage('fr')}"
+						update="loginPanel">
+						<p:graphicImage name="flag_fr_FR.gif" library="images" />
+					</p:commandLink>
+				</h:panelGrid>
+			</h:form>
+		</div>
+
+		<h:outputScript library="primefaces" name="jquery/jquery.js"
+			target="head" />
+
+	</h:body>
+</f:view>
+</html>

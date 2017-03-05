@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<ui:define name="content">
+		<h1 class="aw-page-title">#{messages.tituloocupacoes}</h1>
+
+		<h:form id="frm">
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton id="btnAdd" title="#{messages.novo}"
+						action="#{ocupacaoC.preparaInclusao}"
+						oncomplete="PF('itemDialog').show()" process="@this"
+						update="itemPanel" icon="fa fa-fw fa-plus" />
+						
+					<p:commandButton id="btnReport" title="Emitir relatorio"
+					   icon="fa fa-fw fa-print"/>	
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:messages autoUpdate="false" />
+
+			<p:dataTable id="itensTable" widgetVar="dataTable" var="item"
+				loadingMessage="#{messages.loadingMessage}" emptyMessage="#{messages.nenhumregistro}"
+				reflow="true" value="#{ocupacaoC.elementos}" selectionMode="single"
+				selection="#{ocupacaoC.registroSelecionado}" rowKey="#{item.id}"
+				style="margin-top:10px">
+
+				<p:column headerText="#{messages.codigo}" style="width:50px">
+					<h:outputText value="#{item.id}" />
+				</p:column>
+
+				<p:column headerText="#{messages.headerocupacao}">
+					<h:outputText value="#{item.dsOcupacao}" />
+				</p:column>
+
+			</p:dataTable>
+
+			<p:dialog widgetVar="itemDialog" header="#{messages.tituloocupacoes}"
+				responsive="true" resizable="false" showEffect="explode"
+				style="min-width: 400px" modal="true">
+
+				<p:toolbar>
+					<p:toolbarGroup>
+						<p:commandButton icon="fa fa-fw fa-save" title="#{messages.salvar}"
+							action="#{ocupacaoC.salvar}" process="itemPanel"
+							update="itemPanel itensTable"
+							oncomplete="closeDialogIfSucess(xhr, status, args, PF('itemDialog'), 'itemDialog')" />
+
+						<p:commandButton icon="fa-sign-in" title="#{messages.sair}"
+							oncomplete="PF('itemDialog').hide()" />
+
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<h:panelGroup id="itemPanel" layout="block" styleClass="ui-fluid" style="margin-top: 10px;">
+					<p:messages id="msgDialog" autoUpdate="false" />
+
+					<p:panelGrid columns="2" layout="grid"
+						styleClass="panelgrid-noborder"
+						columnClasses="ui-grid-col-4, ui-grid-col-8">
+
+						<p:outputLabel for="nome" value="#{messages.lblocupacao}:" />
+						<p:inputText id="nome" value="#{ocupacaoC.ocupacao.dsOcupacao}"
+							placeholder="#{messages.lblocupacao}" />
+
+					</p:panelGrid>
+
+				</h:panelGroup>
+
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+
+</ui:composition>
